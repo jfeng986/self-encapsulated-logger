@@ -1,2 +1,3 @@
-[INFO]2023/07/24 17:48:49 logger.go:23: hello world
-[INFO]2023/07/24 17:50:43 logger.go:23: hello world[INFO]2023/07/24 17:51:22 logger.go:23: hello world
+[INFO] 2023/07/24 21:19:46 logger.go:35: hello world
+[DEBUG] 2023/07/24 21:19:46 logger.go:41: hello world -- Debug
+[INFO] 2023/07/24 21:19:54 logger.go:35: hello world
