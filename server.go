@@ -5,8 +5,10 @@ import (
 )
 
 func main() {
-	logger.SetFile("log/test.log")
-	logger.SetLevel(logger.InfoLevel)
-	logger.Info("hello world")
+	// logger.SetLogFile()
+	logger.SetLogLevel(logger.DebugLevel)
+	logger.Info("hello world -- Info")
 	logger.Debug("hello world -- Debug")
+	logger.Warn("hello world -- Warn")
+	logger.Error("hello world -- Error")
 }

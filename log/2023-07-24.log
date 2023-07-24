@@ -1,0 +1,4 @@
+[INFO] 2023/07/24 23:21:36 goProjects/self-encapsulated-logger/server.go:10 hello world -- Info
+[DEBUG] 2023/07/24 23:21:36 goProjects/self-encapsulated-logger/server.go:11 hello world -- Debug
+[WARN] 2023/07/24 23:21:36 goProjects/self-encapsulated-logger/server.go:12 hello world -- Warn
+[ERROR] 2023/07/24 23:21:36 goProjects/self-encapsulated-logger/server.go:13 hello world -- Error
