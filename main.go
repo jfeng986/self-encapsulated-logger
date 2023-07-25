@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	// logger.SetLogFile()
+	logger.SetLogFile("./log/test.log")
 	logger.SetLogLevel(logger.DebugLevel)
 	logger.Info("hello world -- Info")
 	logger.Debug("hello world -- Debug")

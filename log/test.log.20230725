@@ -1,0 +1,4 @@
+[DEBUG] 2023/07/25 11:44:35 self-encapsulated-logger/logger/logger_test.go:13 This is a debug log for today
+[INFO] 2023/07/25 11:44:35 self-encapsulated-logger/logger/logger_test.go:14 This is an info log for today
+[WARN] 2023/07/25 11:44:35 self-encapsulated-logger/logger/logger_test.go:15 This is a warning log for today
+[ERROR] 2023/07/25 11:44:35 self-encapsulated-logger/logger/logger_test.go:16 This is an error log for today

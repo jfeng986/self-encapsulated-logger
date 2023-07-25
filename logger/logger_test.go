@@ -2,19 +2,25 @@ package logger
 
 import (
 	"testing"
+	"time"
 )
 
 func TestLogger(t *testing.T) {
 	SetLogLevel(DebugLevel)
-	// SetLogFile("../log/test.log")
 
-	Debug("This is a debug message: %s", "debug")
-	Info("This is an info message: %s", "info")
-	Warn("This is a warning message: %s", "warning")
-	Error("This is an error message: %s", "error")
+	SetLogFile("../log/test.log")
 
-	Debug("This is a debug message for the next day: %s", "debug")
-	Info("This is an info message for the next day: %s", "info")
-	Warn("This is a warning message for the next day: %s", "warning")
-	Error("This is an error message for the next day: %s", "error")
+	Debug("This is a debug log for today")
+	Info("This is an info log for today")
+	Warn("This is a warning log for today")
+	Error("This is an error log for today")
+
+	SetNowFunc(func() time.Time {
+		return time.Now().Add(24 * time.Hour)
+	})
+
+	Debug("This is a debug log for tomorrow")
+	Info("This is an info log for tomorrow")
+	Warn("This is a warning log for tomorrow")
+	Error("This is an error log for tomorrow")
 }

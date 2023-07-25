@@ -7,16 +7,21 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
 var (
-	debugLogger *log.Logger
-	infoLogger  *log.Logger
-	warnLogger  *log.Logger
-	errorLogger *log.Logger
-	logLevel    int
-	logFile     string
+	debugLogger   *log.Logger
+	infoLogger    *log.Logger
+	warnLogger    *log.Logger
+	errorLogger   *log.Logger
+	logLevel      int
+	logging       *os.File
+	day           int
+	logFile       string
+	dayChangeLock sync.RWMutex
+	nowFunc       func() time.Time = time.Now
 )
 
 const (
@@ -26,22 +31,53 @@ const (
 	ErrorLevel
 )
 
+func SetNowFunc(f func() time.Time) { // for test
+	nowFunc = f
+}
+
 func SetLogLevel(level int) {
 	logLevel = level
 }
 
-func init() {
+func SetLogFile(file string) {
+	logFile = file
 	now := time.Now()
-	formattedDate := now.Format("2006-01-02")
-	logFile = fmt.Sprintf("log%s%s.log", string(os.PathSeparator), formattedDate)
-	logging, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o664)
-	if err != nil {
+	var err error
+	if logging, err = os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o664); err != nil {
 		panic(err)
 	} else {
 		debugLogger = log.New(logging, "[DEBUG] ", log.LstdFlags)
 		infoLogger = log.New(logging, "[INFO] ", log.LstdFlags)
 		warnLogger = log.New(logging, "[WARN] ", log.LstdFlags)
 		errorLogger = log.New(logging, "[ERROR] ", log.LstdFlags)
+		day = now.YearDay()
+		dayChangeLock = sync.RWMutex{}
+	}
+}
+
+func checkAndChangeLogfile() {
+	dayChangeLock.Lock()
+	defer dayChangeLock.Unlock()
+	now := nowFunc()
+	if now.YearDay() == day {
+		return
+	}
+	logging.Close()
+	postFix := now.Add(-24 * time.Hour).Format("20060102")
+	if err := os.Rename(logFile, logFile+"."+postFix); err != nil {
+		fmt.Printf("append date postfix %s to log file %s failed: %v\n", postFix, logFile, err)
+		return
+	}
+	var err error
+	if logging, err = os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o664); err != nil {
+		fmt.Printf("create log file %s failed %v\n", logFile, err)
+		return
+	} else {
+		debugLogger = log.New(logging, "[DEBUG] ", log.LstdFlags)
+		infoLogger = log.New(logging, "[INFO] ", log.LstdFlags)
+		warnLogger = log.New(logging, "[WARN] ", log.LstdFlags)
+		errorLogger = log.New(logging, "[ERROR] ", log.LstdFlags)
+		day = now.YearDay()
 	}
 }
 
@@ -56,24 +92,28 @@ func addPrefix() string {
 
 func Debug(format string, v ...any) {
 	if logLevel <= DebugLevel {
+		checkAndChangeLogfile()
 		debugLogger.Printf(addPrefix()+" "+format, v...)
 	}
 }
 
 func Info(format string, v ...any) {
 	if logLevel <= InfoLevel {
+		checkAndChangeLogfile()
 		infoLogger.Printf(addPrefix()+" "+format, v...)
 	}
 }
 
 func Warn(format string, v ...any) {
 	if logLevel <= WarnLevel {
+		checkAndChangeLogfile()
 		warnLogger.Printf(addPrefix()+" "+format, v...)
 	}
 }
 
 func Error(format string, v ...any) {
 	if logLevel <= ErrorLevel {
+		checkAndChangeLogfile()
 		errorLogger.Printf(addPrefix()+" "+format, v...)
 	}
 }
